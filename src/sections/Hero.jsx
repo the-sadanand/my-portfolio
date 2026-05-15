@@ -2,7 +2,6 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useParallax } from "react-scroll-parallax";
 import { useRef, useState } from "react";
 import { personalInfo } from "../data/portfolioData";
-import avatarImg from "../assets/avatar.webp";
 
 function GithubIcon() {
   return (
@@ -247,10 +246,7 @@ function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Right: 3D Photo */}
-        <motion.div initial={{ opacity: 0, scale: 0.8, x: 60 }} animate={{ opacity: 1, scale: 1, x: 0 }} transition={{ duration: 1, delay: 0.4, ease: "easeOut" }} className="flex items-center justify-center shrink-0">
-          <Photo3D />
-        </motion.div>
+
       </div>
 
       {/* Scroll indicator */}
