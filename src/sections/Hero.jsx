@@ -2,7 +2,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useParallax } from "react-scroll-parallax";
 import { useRef, useState } from "react";
 import { personalInfo } from "../data/portfolioData";
-
+import moonImg from "../assets/moon.jpg";
 function GithubIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -134,7 +134,7 @@ function Moon3D() {
         >
           {/* Real moon photo from NASA public domain */}
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/600px-FullMoon2010.jpg"
+            src={moonImg}
             alt="Moon surface with craters"
             style={{
               width: "100%",

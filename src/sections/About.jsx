@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { personalInfo, education, certifications } from "../data/portfolioData";
+import avatarImg from "../assets/avatar.jpeg";
 
 const TEAL = "#14ffec";
 const VIOLET = "#7b2fff";
@@ -43,8 +44,8 @@ function About() {
 
             {/* Avatar */}
             <motion.div variants={itemVariants} style={{ position: "relative" }}>
-              <div style={{ width: 210, height: 210, borderRadius: 20, overflow: "hidden", border: "2px solid rgba(20,255,236,0.2)", boxShadow: "0 0 60px rgba(20,255,236,0.12), 0 0 120px rgba(123,47,255,0.08)" }}>
-                <img src={personalInfo.avatarUrl} alt={personalInfo.name} style={{ width: "100%", height: "100%", objectFit: "cover", background: "#0d1117" }} loading="lazy" />
+              <div style={{ width: 180, height: 180, borderRadius: 90, overflow: "hidden", boxShadow: "0 0 60px rgba(20,255,236,0.12), 0 0 120px rgba(123,47,255,0.08)" }}>
+                <img src={avatarImg} alt={personalInfo.name} style={{ width: "100%", height: "100%", objectFit: "cover", background: "#0d1117" }} loading="lazy" />
               </div>
               <motion.div
                 style={{ position: "absolute", bottom: -14, right: -14, padding: "8px 14px", borderRadius: 12, background: "linear-gradient(135deg, #0d7377, #7b2fff)", color: TEXT, fontSize: 12, fontWeight: 600, boxShadow: "0 0 20px rgba(20,255,236,0.25)", whiteSpace: "nowrap" }}
