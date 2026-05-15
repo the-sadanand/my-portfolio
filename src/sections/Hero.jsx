@@ -1,8 +1,9 @@
-import { motion} from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useParallax } from "react-scroll-parallax";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { personalInfo } from "../data/portfolioData";
-import moonImg from "../assets/moon.jpg";
+import avatarImg from "../assets/avatar.webp";
+
 function GithubIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -39,207 +40,121 @@ function ArrowDownIcon() {
   );
 }
 
-function Moon3D() {
+function Photo3D() {
   const containerRef = useRef(null);
-  const [moonSize, setMoonSize] = useState(420);
-  useEffect(() => {
-    const updateMoonSize = () => {
-      const screenWidth = window.innerWidth;
-      let size;
-      if (screenWidth < 640) {
-        size = Math.min(280, screenWidth - 48); // Mobile
-      } else if (screenWidth < 1024) {
-        size = 320; // Tablet
-      } else {
-        size = 420; // Desktop
-      }
-      setMoonSize(size);
-    };
+  const [isHovered, setIsHovered] = useState(false);
 
-    updateMoonSize();
-    window.addEventListener("resize", updateMoonSize);
-    return () => window.removeEventListener("resize", updateMoonSize);
-  }, []);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { stiffness: 60, damping: 20 };
+  const rotateX = useSpring(useTransform(mouseY, [-1, 1], [15, -15]), springConfig);
+  const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-18, 18]), springConfig);
+
+  const handleMouseMove = (e) => {
+    const rect = containerRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    mouseX.set((e.clientX - centerX) / (rect.width / 2));
+    mouseY.set((e.clientY - centerY) / (rect.height / 2));
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+    setIsHovered(false);
+  };
 
   return (
     <div
       ref={containerRef}
-      className="relative flex items-center justify-center"
-    
-      style={{ width: moonSize, height: moonSize, perspective: "900px" }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => setIsHovered(true)}
+      style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", width: 380, height: 420, perspective: "900px" }}
     >
-      {/* Outer atmosphere ring 3 */}
+      {/* Outer glow ring */}
       <motion.div
-        className="absolute rounded-full"
-        style={{
-          width: moonSize - 10,
-          height: moonSize - 10,
-          background: "radial-gradient(circle, transparent 48%, rgba(13,115,119,0.06) 65%, rgba(13,115,119,0.12) 75%, transparent 90%)",
-        }}
+        style={{ position: "absolute", width: 370, height: 410, borderRadius: "50%", background: "radial-gradient(ellipse, transparent 55%, rgba(20,255,236,0.08) 70%, rgba(20,255,236,0.15) 80%, transparent 92%)" }}
         animate={{ rotate: 360 }}
-        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
       />
 
-      {/* Outer atmosphere ring 2 */}
+      {/* Violet ring */}
       <motion.div
-        className="absolute rounded-full"
-        style={{
-          width: moonSize - 50,
-          height: moonSize - 50,
-          background: "radial-gradient(circle, transparent 52%, rgba(123,47,255,0.05) 68%, rgba(123,47,255,0.10) 78%, transparent 92%)",
-        }}
+        style={{ position: "absolute", width: 340, height: 375, borderRadius: "50%", background: "radial-gradient(ellipse, transparent 58%, rgba(123,47,255,0.08) 73%, rgba(123,47,255,0.12) 83%, transparent 94%)" }}
         animate={{ rotate: -360 }}
-        transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
       />
 
-      {/* Glow beneath moon */}
-      <div
-        className="absolute rounded-full"
-        style={{
-          width: moonSize - 100,
-          height: moonSize - 100,
-          background: "radial-gradient(circle, rgba(20,255,236,0.08) 0%, rgba(13,115,119,0.06) 40%, transparent 70%)",
-          filter: "blur(12px)",
-        }}
-      />
+      {/* Ambient glow beneath photo */}
+      <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(20,255,236,0.1) 0%, rgba(123,47,255,0.06) 50%, transparent 70%)", filter: "blur(20px)" }} />
 
-      {/* 3D Moon container */}
+      {/* 3D Photo */}
       <motion.div
-        style={{
-          transformStyle: "preserve-3d",
-          width: moonSize - 120,
-          height: moonSize - 120,
-        }}
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d", width: 300, height: 340 }}
       >
-        {/* Moon image */}
         <motion.div
-          className="relative rounded-full overflow-hidden"
           style={{
-            width: moonSize - 120,
-            height: moonSize - 120,
-            boxShadow: "0 0 40px rgba(20,255,236,0.15), 0 0 80px rgba(13,115,119,0.10), inset 0 0 40px rgba(0,0,0,0.5)",
+            width: 300,
+            height: 340,
+            borderRadius: 24,
+            overflow: "hidden",
+            boxShadow: isHovered
+              ? "0 0 50px rgba(20,255,236,0.3), 0 0 100px rgba(123,47,255,0.15), 0 30px 60px rgba(0,0,0,0.6)"
+              : "0 0 30px rgba(20,255,236,0.15), 0 0 60px rgba(123,47,255,0.08), 0 20px 40px rgba(0,0,0,0.5)",
+            border: "1.5px solid rgba(20,255,236,0.25)",
+            transition: "box-shadow 0.4s ease",
           }}
         >
-          {/* Real moon photo from NASA public domain */}
+          {/* Actual photo */}
           <img
-            src={moonImg}
-            alt="Moon surface with craters"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center",
-              filter: "brightness(0.85) contrast(1.15) saturate(0.8) hue-rotate(160deg)",
-              mixBlendMode: "normal",
-            }}
+            src={avatarImg}
+            alt={personalInfo.name}
+            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} fetchpriority="high" loading="eager"
           />
 
-          {/* Teal color overlay for theme matching */}
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: "radial-gradient(circle at 35% 35%, rgba(20,255,236,0.06) 0%, transparent 60%)",
-              mixBlendMode: "screen",
-            }}
-          />
-
-          {/* Shadow side overlay for 3D sphere feel */}
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: "radial-gradient(circle at 70% 65%, rgba(0,0,0,0.5) 0%, transparent 55%)",
-            }}
+          {/* Subtle teal overlay on hover */}
+          <motion.div
+            style={{ position: "absolute", inset: 0, borderRadius: 24, background: "linear-gradient(to bottom, transparent 50%, rgba(13,115,119,0.3) 100%)", opacity: isHovered ? 1 : 0.5, transition: "opacity 0.4s" }}
           />
         </motion.div>
 
-        {/* Floating shadow below moon for 3D depth */}
-        <div
-          className="absolute left-1/2"
-          style={{
-            width: (moonSize - 120) * 0.8,
-            height: (moonSize - 120) * 0.08,
-            background: "radial-gradient(ellipse, rgba(13,115,119,0.25) 0%, transparent 70%)",
-            filter: "blur(8px)",
-            transform: "translateX(-50%) translateY(16px) translateZ(-40px)",
-            top: "100%",
-          }}
-        />
+        {/* Ground shadow */}
+        <div style={{ position: "absolute", left: "50%", top: "100%", width: 200, height: 20, background: "radial-gradient(ellipse, rgba(20,255,236,0.2) 0%, transparent 70%)", filter: "blur(8px)", transform: "translateX(-50%) translateY(10px) translateZ(-40px)" }} />
       </motion.div>
 
-      {/* Orbiting particle 1 */}
+      {/* Name badge floating below photo */}
       <motion.div
-        className="absolute"
-        style={{ width: moonSize - 40, height: moonSize - 40 }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", padding: "10px 24px", borderRadius: 999, background: "rgba(5,10,14,0.9)", border: "1px solid rgba(20,255,236,0.3)", backdropFilter: "blur(10px)", whiteSpace: "nowrap", zIndex: 10 }}
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
       >
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: 6,
-            height: 6,
-            background: "#14ffec",
-            top: "2%",
-            left: "50%",
-            boxShadow: "0 0 8px #14ffec",
-          }}
-        />
+        <span style={{ background: "linear-gradient(135deg,#14ffec,#7b2fff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontSize: 13, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>
+          {personalInfo.name}
+        </span>
+        <span style={{ color: "#5a8080", fontSize: 11, marginLeft: 8 }}>· {personalInfo.title}</span>
       </motion.div>
 
-      {/* Orbiting particle 2 */}
-      <motion.div
-        className="absolute"
-        style={{ width: moonSize - 80, height: moonSize - 80 }}
-        animate={{ rotate: -360 }}
-        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-      >
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: 4,
-            height: 4,
-            background: "#7b2fff",
-            bottom: "5%",
-            right: "8%",
-            boxShadow: "0 0 6px #7b2fff",
-          }}
-        />
+      {/* Orbiting particle teal */}
+      <motion.div style={{ position: "absolute", width: 360, height: 400 }} animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}>
+        <div style={{ position: "absolute", width: 6, height: 6, borderRadius: "50%", background: "#14ffec", top: "2%", left: "50%", boxShadow: "0 0 8px #14ffec" }} />
       </motion.div>
 
-      {/* Orbiting particle 3 */}
-      <motion.div
-        className="absolute"
-        style={{ width: moonSize - 60, height: moonSize - 60 }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 40, repeat: Infinity, ease: "linear", delay: 5 }}
-      >
-        <div
-          className="absolute rounded-full"
-          style={{
-            width: 3,
-            height: 3,
-            background: "#ff6eab",
-            top: "15%",
-            right: "3%",
-            boxShadow: "0 0 5px #ff6eab",
-          }}
-        />
+      {/* Orbiting particle violet */}
+      <motion.div style={{ position: "absolute", width: 340, height: 380 }} animate={{ rotate: -360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}>
+        <div style={{ position: "absolute", width: 4, height: 4, borderRadius: "50%", background: "#7b2fff", bottom: "5%", right: "5%", boxShadow: "0 0 6px #7b2fff" }} />
       </motion.div>
 
-      {/* Infinity symbol floating near moon */}
+      {/* Orbiting particle pink */}
+      <motion.div style={{ position: "absolute", width: 350, height: 390 }} animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear", delay: 5 }}>
+        <div style={{ position: "absolute", width: 3, height: 3, borderRadius: "50%", background: "#ff6eab", top: "15%", right: "2%", boxShadow: "0 0 5px #ff6eab" }} />
+      </motion.div>
+
+      {/* Infinity symbol */}
       <motion.div
-        className="absolute"
-        style={{
-          fontSize: 28,
-          color: "#14ffec",
-          opacity: 0.25,
-          bottom: "8%",
-          right: "6%",
-          fontWeight: 300,
-          letterSpacing: "-1px",
-          userSelect: "none",
-        }}
-        animate={{ opacity: [0.15, 0.35, 0.15], scale: [1, 1.08, 1] }}
+        style={{ position: "absolute", fontSize: 26, color: "#14ffec", opacity: 0.2, bottom: "12%", right: "4%", userSelect: "none" }}
+        animate={{ opacity: [0.12, 0.28, 0.12], scale: [1, 1.1, 1] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       >
         ∞
@@ -251,15 +166,8 @@ function Moon3D() {
 function Hero() {
   const { ref: bgRef } = useParallax({ speed: -10 });
 
-  const scrollToAbout = () => {
-    const el = document.querySelector("#about");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const scrollToProjects = () => {
-    const el = document.querySelector("#projects");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
+  const scrollToAbout = () => { document.querySelector("#about")?.scrollIntoView({ behavior: "smooth" }); };
+  const scrollToProjects = () => { document.querySelector("#projects")?.scrollIntoView({ behavior: "smooth" }); };
 
   const containerVariants = {
     hidden: {},
@@ -272,149 +180,66 @@ function Hero() {
   };
 
   return (
-    <section
-      id="home"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      style={{ background: "#050a0e" }}
-    >
-      {/* Parallax starfield + nebula bg */}
-      <div ref={bgRef} className="absolute inset-0 pointer-events-none">
-        {/* Nebula blobs */}
-        <motion.div
-          className="absolute rounded-full"
-          style={{ width: 500, height: 400, top: "-10%", left: "-10%", background: "radial-gradient(ellipse, rgba(13,115,119,0.18) 0%, transparent 70%)", filter: "blur(40px)" }}
-          animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute rounded-full"
-          style={{ width: 400, height: 350, bottom: "0%", right: "5%", background: "radial-gradient(ellipse, rgba(123,47,255,0.15) 0%, transparent 70%)", filter: "blur(40px)" }}
-          animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.9, 0.5] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        />
-        <motion.div
-          className="absolute rounded-full"
-          style={{ width: 300, height: 280, bottom: "20%", left: "5%", background: "radial-gradient(ellipse, rgba(255,110,171,0.10) 0%, transparent 70%)", filter: "blur(35px)" }}
-          animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.8, 0.4] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 6 }}
-        />
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "#050a0e" }}>
 
-        {/* Stars */}
-        {[
-          [8,8],[60,45],[130,20],[220,60],[330,15],[450,40],[580,25],[640,70],
-          [30,140],[100,200],[180,160],[280,210],[400,170],[520,190],[620,140],
-          [50,310],[160,380],[270,340],[380,420],[490,370],[600,400],[660,280],
-          [20,470],[110,500],[230,460],[350,490],[470,510],[560,470],[630,500],
-        ].map(([x, y], i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full bg-white"
-            style={{ left: x, top: y, width: i % 5 === 0 ? 2 : 1.2, height: i % 5 === 0 ? 2 : 1.2 }}
-            animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{ duration: 2 + (i % 4), repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }}
-          />
+      {/* Parallax nebula + stars */}
+      <div ref={bgRef} className="absolute inset-0 pointer-events-none">
+        <motion.div style={{ position: "absolute", width: 500, height: 400, top: "-10%", left: "-10%", background: "radial-gradient(ellipse, rgba(13,115,119,0.18) 0%, transparent 70%)", filter: "blur(40px)" }} animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} />
+        <motion.div style={{ position: "absolute", width: 400, height: 350, bottom: "0%", right: "5%", background: "radial-gradient(ellipse, rgba(123,47,255,0.15) 0%, transparent 70%)", filter: "blur(40px)" }} animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.9, 0.5] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }} />
+        <motion.div style={{ position: "absolute", width: 300, height: 280, bottom: "20%", left: "5%", background: "radial-gradient(ellipse, rgba(255,110,171,0.10) 0%, transparent 70%)", filter: "blur(35px)" }} animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.8, 0.4] }} transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 6 }} />
+        {[[8,8],[60,45],[130,20],[220,60],[330,15],[450,40],[580,25],[640,70],[30,140],[100,200],[180,160],[280,210],[400,170],[520,190],[620,140],[50,310],[160,380],[270,340],[380,420],[490,370],[600,400],[660,280],[20,470],[110,500],[230,460],[350,490],[470,510],[560,470],[630,500]].map(([x, y], i) => (
+          <motion.div key={i} style={{ position: "absolute", left: x, top: y, width: i % 5 === 0 ? 2 : 1.2, height: i % 5 === 0 ? 2 : 1.2, borderRadius: "50%", background: "#fff" }} animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2 + (i % 4), repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }} />
         ))}
       </div>
 
       {/* Grid overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage: "linear-gradient(#14ffec 1px, transparent 1px), linear-gradient(90deg, #14ffec 1px, transparent 1px)",
-          backgroundSize: "70px 70px",
-        }}
-      />
+      <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(#14ffec 1px, transparent 1px), linear-gradient(90deg, #14ffec 1px, transparent 1px)", backgroundSize: "70px 70px" }} />
 
       {/* Main layout */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 w-full flex flex-col lg:flex-row items-center justify-between gap-12 pt-20">
 
-        {/* Left: Text content */}
-        <motion.div
-          className="flex flex-col items-start max-w-xl"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Badge */}
+        {/* Left: Text */}
+        <motion.div className="flex flex-col items-start max-w-xl" variants={containerVariants} initial="hidden" animate="visible">
           <motion.div variants={itemVariants} className="mb-6">
-            <span
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium"
-              style={{ background: "rgba(13,115,119,0.15)", border: "1px solid rgba(20,255,236,0.3)", color: "#14ffec" }}
-            >
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: "#14ffec" }} />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 999, background: "rgba(13,115,119,0.15)", border: "1px solid rgba(20,255,236,0.3)", color: "#14ffec", fontSize: 13, fontWeight: 500 }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#14ffec", display: "inline-block", animation: "pulse 2s infinite" }} />
               Available for opportunities
             </span>
           </motion.div>
 
-          {/* Name */}
-          <motion.h1
-            variants={itemVariants}
-            className="text-5xl md:text-6xl font-bold mb-3 leading-tight"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
+          <motion.h1 variants={itemVariants} style={{ fontSize: "clamp(2.4rem,5vw,3.8rem)", fontWeight: 700, marginBottom: 12, lineHeight: 1.15, fontFamily: "'Space Grotesk', sans-serif" }}>
             <span style={{ color: "#e0fff4" }}>Hi, I&apos;m </span>
-            <span style={{ background: "linear-gradient(135deg, #14ffec, #7b2fff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span style={{ background: "linear-gradient(135deg,#14ffec,#7b2fff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               {personalInfo.name}
             </span>
           </motion.h1>
 
-          {/* Title */}
-          <motion.h2
-            variants={itemVariants}
-            className="text-xl md:text-2xl font-medium mb-5"
-            style={{ color: "#8ab0b0" }}
-          >
+          <motion.h2 variants={itemVariants} style={{ fontSize: "clamp(1.1rem,2.5vw,1.4rem)", fontWeight: 500, color: "#8ab0b0", marginBottom: 20 }}>
             {personalInfo.title}
           </motion.h2>
 
-          {/* Tagline */}
-          <motion.p
-            variants={itemVariants}
-            className="text-base md:text-lg leading-relaxed mb-8"
-            style={{ color: "#5a8080", maxWidth: 440 }}
-          >
-            {personalInfo.tagline} Crafting experiences that reach beyond the infinite.
+          <motion.p variants={itemVariants} style={{ fontSize: 15, lineHeight: 1.85, color: "#5a8080", maxWidth: 440, marginBottom: 32 }}>
+            {personalInfo.tagline} Crafting systems that reach beyond the infinite.
           </motion.p>
 
-          {/* CTA Buttons */}
-          <motion.div variants={itemVariants} className="flex flex-wrap gap-4 mb-10">
-            <motion.button
-              onClick={scrollToProjects}
-              className="px-7 py-3 rounded-full font-medium text-sm cursor-pointer border-none outline-none"
-              style={{ background: "linear-gradient(135deg, #0d7377, #7b2fff)", color: "#fff", boxShadow: "0 0 25px rgba(20,255,236,0.2)" }}
-              whileHover={{ scale: 1.06, boxShadow: "0 0 40px rgba(20,255,236,0.35)" }}
-              whileTap={{ scale: 0.95 }}
-            >
+          <motion.div variants={itemVariants} style={{ display: "flex", flexWrap: "wrap", gap: 14, marginBottom: 36 }}>
+            <motion.button onClick={scrollToProjects} style={{ padding: "12px 28px", borderRadius: 999, background: "linear-gradient(135deg,#0d7377,#7b2fff)", color: "#fff", fontWeight: 600, fontSize: 14, border: "none", cursor: "pointer", boxShadow: "0 0 25px rgba(20,255,236,0.2)", fontFamily: "inherit" }} whileHover={{ scale: 1.06, boxShadow: "0 0 40px rgba(20,255,236,0.35)" }} whileTap={{ scale: 0.95 }}>
               View My Work
             </motion.button>
-            <motion.a
-              href={"mailto:" + personalInfo.email}
-              className="px-7 py-3 rounded-full font-medium text-sm"
-              style={{ border: "1px solid rgba(20,255,236,0.35)", color: "#14ffec" }}
-              whileHover={{ scale: 1.06, backgroundColor: "rgba(20,255,236,0.08)" }}
-              whileTap={{ scale: 0.95 }}
-            >
+            <motion.a href={"mailto:" + personalInfo.email} style={{ padding: "12px 28px", borderRadius: 999, border: "1px solid rgba(20,255,236,0.35)", color: "#14ffec", fontSize: 14, fontWeight: 500, textDecoration: "none" }} whileHover={{ scale: 1.06, backgroundColor: "rgba(20,255,236,0.08)" }} whileTap={{ scale: 0.95 }}>
               Get In Touch
             </motion.a>
           </motion.div>
 
-          {/* Social Icons */}
-          <motion.div variants={itemVariants} className="flex items-center gap-4">
+          <motion.div variants={itemVariants} style={{ display: "flex", gap: 14 }}>
             {[
               { icon: <GithubIcon />, href: personalInfo.github, label: "GitHub" },
               { icon: <LinkedinIcon />, href: personalInfo.linkedin, label: "LinkedIn" },
               { icon: <MailIcon />, href: "mailto:" + personalInfo.email, label: "Email" },
             ].map((s) => (
-              <motion.a
-                key={s.label}
-                href={s.href}
-                target={s.label !== "Email" ? "_blank" : undefined}
-                rel="noopener noreferrer"
-                aria-label={s.label}
-                className="w-10 h-10 flex items-center justify-center rounded-full"
-                style={{ border: "1px solid rgba(20,255,236,0.2)", color: "#5a9090" }}
-                whileHover={{ scale: 1.2, color: "#14ffec", borderColor: "rgba(20,255,236,0.6)" }}
-                whileTap={{ scale: 0.9 }}
+              <motion.a key={s.label} href={s.href} target={s.label !== "Email" ? "_blank" : undefined} rel="noopener noreferrer" aria-label={s.label}
+                style={{ width: 42, height: 42, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", border: "1px solid rgba(20,255,236,0.2)", color: "#5a9090", textDecoration: "none" }}
+                whileHover={{ scale: 1.2, color: "#14ffec", borderColor: "rgba(20,255,236,0.6)" }} whileTap={{ scale: 0.9 }}
               >
                 {s.icon}
               </motion.a>
@@ -422,32 +247,16 @@ function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Right: 3D Moon */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8, x: 60 }}
-          animate={{ opacity: 1, scale: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
-          className="flex items-center justify-center shrink-0"
-        >
-          <Moon3D />
+        {/* Right: 3D Photo */}
+        <motion.div initial={{ opacity: 0, scale: 0.8, x: 60 }} animate={{ opacity: 1, scale: 1, x: 0 }} transition={{ duration: 1, delay: 0.4, ease: "easeOut" }} className="flex items-center justify-center shrink-0">
+          <Photo3D />
         </motion.div>
       </div>
 
       {/* Scroll indicator */}
-      <motion.button
-        onClick={scrollToAbout}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer bg-transparent border-none outline-none"
-        style={{ color: "#3a7070" }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.8 }}
-        whileHover={{ color: "#14ffec" }}
-      >
-        <span className="text-xs tracking-widest uppercase" style={{ fontFamily: "sans-serif" }}>Scroll</span>
-        <motion.div
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-        >
+      <motion.button onClick={scrollToAbout} style={{ position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", color: "#3a7070" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }} whileHover={{ color: "#14ffec" }}>
+        <span style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: "sans-serif" }}>Scroll</span>
+        <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
           <ArrowDownIcon />
         </motion.div>
       </motion.button>
