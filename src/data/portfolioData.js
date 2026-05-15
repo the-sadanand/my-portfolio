@@ -8,7 +8,7 @@ export const personalInfo = {
   tagline: "Building intelligent systems that learn, adapt, and scale beyond limits.",
   bio: "I'm a BTech Computer Science student specialising in AI & ML at Aditya College of Engineering & Technology, Kakinada (CGPA: 8.43). I build end-to-end ML systems — from fine-tuning YOLOv8 models at 92.3% mAP to architecting real-time RAG pipelines with sub-500ms response times. My work spans deep learning, computer vision, MLOps, full-stack web development, and blockchain smart contracts. I'm passionate about shipping production-grade AI that solves real problems, and I'm actively seeking opportunities to push those boundaries further.",
   email: "thesadanand.toponed0@gmail.com",
-  phone: "+91 9508710644",
+  phone: "+91 XXXX XXXX",
   github: "https://github.com/the-sadanand/",
   linkedin: "https://www.linkedin.com/in/sadanand-k7/",
   resumeUrl: "https://drive.google.com/file/d/1Okp5_g0rcBvG_4uM_QlI5Z8PTTCF3gjt/view?usp=drive_link",
