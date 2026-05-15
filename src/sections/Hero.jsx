@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion} from "framer-motion";
 import { useParallax } from "react-scroll-parallax";
 import { useRef, useState, useEffect } from "react";
 import { personalInfo } from "../data/portfolioData";
@@ -61,20 +61,11 @@ function Moon3D() {
     return () => window.removeEventListener("resize", updateMoonSize);
   }, []);
 
-  const handleMouseMove = (e) => {
-    // Disabled - no hover effects
-  };
-
-  const handleMouseLeave = () => {
-    // Disabled - no hover effects
-  };
-
   return (
     <div
       ref={containerRef}
       className="relative flex items-center justify-center"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+    
       style={{ width: moonSize, height: moonSize, perspective: "900px" }}
     >
       {/* Outer atmosphere ring 3 */}
