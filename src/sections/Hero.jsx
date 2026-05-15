@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useParallax } from "react-scroll-parallax";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { personalInfo } from "../data/portfolioData";
 import moonImg from "../assets/moon.jpg";
 function GithubIcon() {
@@ -41,7 +41,7 @@ function ArrowDownIcon() {
 
 function Moon3D() {
   const containerRef = useRef(null);
-  const [isHovered, setIsHovered] = useState(false);
+  const [moonSize, setMoonSize] = useState(420);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -50,20 +50,31 @@ function Moon3D() {
   const rotateX = useSpring(useTransform(mouseY, [-1, 1], [18, -18]), springConfig);
   const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-22, 22]), springConfig);
 
+  useEffect(() => {
+    const updateMoonSize = () => {
+      const screenWidth = window.innerWidth;
+      let size;
+      if (screenWidth < 640) {
+        size = Math.min(280, screenWidth - 48); // Mobile
+      } else if (screenWidth < 1024) {
+        size = 320; // Tablet
+      } else {
+        size = 420; // Desktop
+      }
+      setMoonSize(size);
+    };
+
+    updateMoonSize();
+    window.addEventListener("resize", updateMoonSize);
+    return () => window.removeEventListener("resize", updateMoonSize);
+  }, []);
+
   const handleMouseMove = (e) => {
-    const rect = containerRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const normalX = (e.clientX - centerX) / (rect.width / 2);
-    const normalY = (e.clientY - centerY) / (rect.height / 2);
-    mouseX.set(normalX);
-    mouseY.set(normalY);
+    // Disabled - no hover effects
   };
 
   const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-    setIsHovered(false);
+    // Disabled - no hover effects
   };
 
   return (
@@ -72,15 +83,14 @@ function Moon3D() {
       className="relative flex items-center justify-center"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      onMouseEnter={() => setIsHovered(true)}
-      style={{ width: 420, height: 420, perspective: "900px" }}
+      style={{ width: moonSize, height: moonSize, perspective: "900px" }}
     >
       {/* Outer atmosphere ring 3 */}
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 410,
-          height: 410,
+          width: moonSize - 10,
+          height: moonSize - 10,
           background: "radial-gradient(circle, transparent 48%, rgba(13,115,119,0.06) 65%, rgba(13,115,119,0.12) 75%, transparent 90%)",
         }}
         animate={{ rotate: 360 }}
@@ -91,8 +101,8 @@ function Moon3D() {
       <motion.div
         className="absolute rounded-full"
         style={{
-          width: 370,
-          height: 370,
+          width: moonSize - 50,
+          height: moonSize - 50,
           background: "radial-gradient(circle, transparent 52%, rgba(123,47,255,0.05) 68%, rgba(123,47,255,0.10) 78%, transparent 92%)",
         }}
         animate={{ rotate: -360 }}
@@ -103,8 +113,8 @@ function Moon3D() {
       <div
         className="absolute rounded-full"
         style={{
-          width: 320,
-          height: 320,
+          width: moonSize - 100,
+          height: moonSize - 100,
           background: "radial-gradient(circle, rgba(20,255,236,0.08) 0%, rgba(13,115,119,0.06) 40%, transparent 70%)",
           filter: "blur(12px)",
         }}
@@ -113,23 +123,18 @@ function Moon3D() {
       {/* 3D Moon container */}
       <motion.div
         style={{
-          rotateX,
-          rotateY,
           transformStyle: "preserve-3d",
-          width: 300,
-          height: 300,
+          width: moonSize - 120,
+          height: moonSize - 120,
         }}
       >
         {/* Moon image */}
         <motion.div
           className="relative rounded-full overflow-hidden"
           style={{
-            width: 300,
-            height: 300,
-            boxShadow: isHovered
-              ? "0 0 60px rgba(20,255,236,0.25), 0 0 120px rgba(13,115,119,0.15), inset 0 0 40px rgba(0,0,0,0.6)"
-              : "0 0 40px rgba(20,255,236,0.15), 0 0 80px rgba(13,115,119,0.10), inset 0 0 40px rgba(0,0,0,0.5)",
-            transition: "box-shadow 0.4s ease",
+            width: moonSize - 120,
+            height: moonSize - 120,
+            boxShadow: "0 0 40px rgba(20,255,236,0.15), 0 0 80px rgba(13,115,119,0.10), inset 0 0 40px rgba(0,0,0,0.5)",
           }}
         >
           {/* Real moon photo from NASA public domain */}
@@ -168,8 +173,8 @@ function Moon3D() {
         <div
           className="absolute left-1/2"
           style={{
-            width: 240,
-            height: 24,
+            width: (moonSize - 120) * 0.8,
+            height: (moonSize - 120) * 0.08,
             background: "radial-gradient(ellipse, rgba(13,115,119,0.25) 0%, transparent 70%)",
             filter: "blur(8px)",
             transform: "translateX(-50%) translateY(16px) translateZ(-40px)",
@@ -181,7 +186,7 @@ function Moon3D() {
       {/* Orbiting particle 1 */}
       <motion.div
         className="absolute"
-        style={{ width: 380, height: 380 }}
+        style={{ width: moonSize - 40, height: moonSize - 40 }}
         animate={{ rotate: 360 }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
       >
@@ -201,7 +206,7 @@ function Moon3D() {
       {/* Orbiting particle 2 */}
       <motion.div
         className="absolute"
-        style={{ width: 340, height: 340 }}
+        style={{ width: moonSize - 80, height: moonSize - 80 }}
         animate={{ rotate: -360 }}
         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
       >
@@ -221,7 +226,7 @@ function Moon3D() {
       {/* Orbiting particle 3 */}
       <motion.div
         className="absolute"
-        style={{ width: 360, height: 360 }}
+        style={{ width: moonSize - 60, height: moonSize - 60 }}
         animate={{ rotate: 360 }}
         transition={{ duration: 40, repeat: Infinity, ease: "linear", delay: 5 }}
       >
