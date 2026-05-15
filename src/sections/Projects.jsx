@@ -1,15 +1,11 @@
 import { motion } from "framer-motion";
-import { projects } from "../data/portfolioData";
-import { personalInfo } from "../data/portfolioData";
+import { projects, personalInfo } from "../data/portfolioData";
 import ProjectCard from "../components/ProjectCard";
 
-function StarIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
+const TEAL = "#14ffec";
+const VIOLET = "#7b2fff";
+const TEXT = "#e0fff4";
+const MUTED = "#5a8080";
 
 function GithubIcon() {
   return (
@@ -22,87 +18,39 @@ function GithubIcon() {
 
 function Projects() {
   return (
-    <section id="projects" className="py-24 px-6 relative overflow-hidden">
-      {/* Background accent */}
-      <div
-        className="absolute top-1/2 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none"
-        style={{ background: "#FF6584", opacity: 0.05 }}
-      />
+    <section id="projects" style={{ background: "#050a0e", padding: "96px 24px", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: "40%", right: "-5%", width: 400, height: 400, background: "radial-gradient(ellipse, rgba(255,110,171,0.07) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none" }} />
 
-      <div className="max-w-6xl mx-auto">
-        {/* Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <span className="text-[#6C63FF] text-sm font-medium tracking-widest uppercase">
-            What I have built
-          </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mt-2">
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} style={{ textAlign: "center", marginBottom: 56 }}>
+          <span style={{ color: TEAL, fontSize: 12, fontWeight: 500, letterSpacing: "0.15em", textTransform: "uppercase" }}>What I have built</span>
+          <h2 style={{ fontSize: "clamp(2rem,5vw,3rem)", fontWeight: 700, color: TEXT, marginTop: 8, fontFamily: "'Space Grotesk', sans-serif" }}>
             My{" "}
-            <span
-              style={{
-                background: "linear-gradient(135deg, #6C63FF, #FF6584)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Projects
-            </span>
+            <span style={{ background: `linear-gradient(135deg, ${TEAL}, ${VIOLET})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Projects</span>
           </h2>
-          <p className="text-[#A0A0B0] mt-4 max-w-xl mx-auto">
-            A selection of things I have designed, built, and shipped. Each project taught me something new.
+          <p style={{ color: MUTED, marginTop: 14, maxWidth: 480, margin: "14px auto 0", fontSize: 15 }}>
+            A selection of things I have designed, built, and shipped across the cosmos.
           </p>
         </motion.div>
 
-        {/* Featured tag row */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex items-center gap-3 mb-8"
-        >
-          <span className="text-[#6C63FF]">
-            <StarIcon />
-          </span>
-          <span className="text-white font-semibold">Featured Projects</span>
-          <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 32 }}>
+          <span style={{ color: TEAL, fontSize: 18 }}>✦</span>
+          <span style={{ color: TEXT, fontWeight: 600, fontFamily: "'Space Grotesk', sans-serif" }}>Featured Projects</span>
+          <div style={{ flex: 1, height: 1, background: "rgba(20,255,236,0.08)" }} />
         </motion.div>
 
-        {/* Projects grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
           {projects.map((project, index) => (
             <ProjectCard key={project.id} project={project} index={index} />
           ))}
         </div>
 
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-16 text-center"
-        >
-          <p className="text-[#A0A0B0] mb-6 text-lg">
-            Want to see more? Check out my GitHub for all projects.
-          </p>
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.3 }} style={{ marginTop: 60, textAlign: "center" }}>
+          <p style={{ color: MUTED, marginBottom: 24, fontSize: 15 }}>Want to see more? Check out my GitHub for all projects.</p>
           <motion.a
-            href={personalInfo.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 px-8 py-3 rounded-full font-medium text-white transition-all duration-300"
-            style={{ border: "1px solid rgba(108,99,255,0.5)", color: "#6C63FF" }}
-            whileHover={{
-              scale: 1.05,
-              backgroundColor: "#6C63FF",
-              color: "#fff",
-              boxShadow: "0 0 25px rgba(108,99,255,0.4)",
-            }}
+            href={personalInfo.github} target="_blank" rel="noopener noreferrer"
+            style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "12px 32px", borderRadius: 999, border: "1px solid rgba(20,255,236,0.3)", color: TEAL, fontWeight: 600, fontSize: 14, textDecoration: "none" }}
+            whileHover={{ scale: 1.05, backgroundColor: "rgba(20,255,236,0.08)", boxShadow: "0 0 30px rgba(20,255,236,0.15)" }}
             whileTap={{ scale: 0.95 }}
           >
             <GithubIcon />
