@@ -42,14 +42,6 @@ function ArrowDownIcon() {
 function Moon3D() {
   const containerRef = useRef(null);
   const [moonSize, setMoonSize] = useState(420);
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const springConfig = { stiffness: 60, damping: 20 };
-  const rotateX = useSpring(useTransform(mouseY, [-1, 1], [18, -18]), springConfig);
-  const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-22, 22]), springConfig);
-
   useEffect(() => {
     const updateMoonSize = () => {
       const screenWidth = window.innerWidth;
