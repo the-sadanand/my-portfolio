@@ -2,6 +2,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useParallax } from "react-scroll-parallax";
 import { useRef, useState } from "react";
 import { personalInfo } from "../data/portfolioData";
+import moonImg from "../assets/moon.webp";
 
 function GithubIcon() {
   return (
@@ -39,7 +40,7 @@ function ArrowDownIcon() {
   );
 }
 
-function Photo3D() {
+function Moon3D() {
   const containerRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -47,8 +48,8 @@ function Photo3D() {
   const mouseY = useMotionValue(0);
 
   const springConfig = { stiffness: 60, damping: 20 };
-  const rotateX = useSpring(useTransform(mouseY, [-1, 1], [15, -15]), springConfig);
-  const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-18, 18]), springConfig);
+  const rotateX = useSpring(useTransform(mouseY, [-1, 1], [18, -18]), springConfig);
+  const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-22, 22]), springConfig);
 
   const handleMouseMove = (e) => {
     const rect = containerRef.current.getBoundingClientRect();
@@ -70,90 +71,94 @@ function Photo3D() {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseEnter={() => setIsHovered(true)}
-      style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", width: 380, height: 420, perspective: "900px" }}
+      style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", width: 420, height: 420, perspective: "900px" }}
     >
-      {/* Outer glow ring */}
+      {/* Outer atmosphere ring */}
       <motion.div
-        style={{ position: "absolute", width: 370, height: 410, borderRadius: "50%", background: "radial-gradient(ellipse, transparent 55%, rgba(20,255,236,0.08) 70%, rgba(20,255,236,0.15) 80%, transparent 92%)" }}
+        style={{ position: "absolute", width: 410, height: 410, borderRadius: "50%", background: "radial-gradient(circle, transparent 48%, rgba(13,115,119,0.06) 65%, rgba(13,115,119,0.12) 75%, transparent 90%)" }}
         animate={{ rotate: 360 }}
-        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
       />
 
       {/* Violet ring */}
       <motion.div
-        style={{ position: "absolute", width: 340, height: 375, borderRadius: "50%", background: "radial-gradient(ellipse, transparent 58%, rgba(123,47,255,0.08) 73%, rgba(123,47,255,0.12) 83%, transparent 94%)" }}
+        style={{ position: "absolute", width: 370, height: 370, borderRadius: "50%", background: "radial-gradient(circle, transparent 52%, rgba(123,47,255,0.05) 68%, rgba(123,47,255,0.10) 78%, transparent 92%)" }}
         animate={{ rotate: -360 }}
-        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
       />
 
-      {/* Ambient glow beneath photo */}
-      <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle, rgba(20,255,236,0.1) 0%, rgba(123,47,255,0.06) 50%, transparent 70%)", filter: "blur(20px)" }} />
+      {/* Ambient glow */}
+      <div
+        style={{ position: "absolute", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(20,255,236,0.08) 0%, rgba(13,115,119,0.06) 40%, transparent 70%)", filter: "blur(12px)" }}
+      />
 
-      {/* 3D Photo */}
-      <motion.div
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d", width: 300, height: 340 }}
-      >
+      {/* 3D Moon container */}
+      <motion.div style={{ rotateX, rotateY, transformStyle: "preserve-3d", width: 300, height: 300 }}>
         <motion.div
           style={{
+            position: "relative",
             width: 300,
-            height: 340,
-            borderRadius: 24,
+            height: 300,
+            borderRadius: "50%",
             overflow: "hidden",
             boxShadow: isHovered
-              ? "0 0 50px rgba(20,255,236,0.3), 0 0 100px rgba(123,47,255,0.15), 0 30px 60px rgba(0,0,0,0.6)"
-              : "0 0 30px rgba(20,255,236,0.15), 0 0 60px rgba(123,47,255,0.08), 0 20px 40px rgba(0,0,0,0.5)",
-            border: "1.5px solid rgba(20,255,236,0.25)",
+              ? "0 0 60px rgba(20,255,236,0.25), 0 0 120px rgba(13,115,119,0.15), inset 0 0 40px rgba(0,0,0,0.6)"
+              : "0 0 40px rgba(20,255,236,0.15), 0 0 80px rgba(13,115,119,0.10), inset 0 0 40px rgba(0,0,0,0.5)",
             transition: "box-shadow 0.4s ease",
           }}
         >
-          {/* Actual photo */}
+          {/* Real moon photo — local WebP, loads instantly */}
           <img
-            src={avatarImg}
-            alt={personalInfo.name}
-            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }} fetchpriority="high" loading="eager"
+            src={moonImg}
+            alt="Moon surface with craters"
+            fetchpriority="high"
+            loading="eager"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+              filter: "brightness(0.85) contrast(1.15) saturate(0.8) hue-rotate(160deg)",
+            }}
           />
 
-          {/* Subtle teal overlay on hover */}
-          <motion.div
-            style={{ position: "absolute", inset: 0, borderRadius: 24, background: "linear-gradient(to bottom, transparent 50%, rgba(13,115,119,0.3) 100%)", opacity: isHovered ? 1 : 0.5, transition: "opacity 0.4s" }}
+          {/* Teal overlay */}
+          <div
+            style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "radial-gradient(circle at 35% 35%, rgba(20,255,236,0.06) 0%, transparent 60%)", mixBlendMode: "screen" }}
+          />
+
+          {/* Shadow side */}
+          <div
+            style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "radial-gradient(circle at 70% 65%, rgba(0,0,0,0.5) 0%, transparent 55%)" }}
           />
         </motion.div>
 
         {/* Ground shadow */}
-        <div style={{ position: "absolute", left: "50%", top: "100%", width: 200, height: 20, background: "radial-gradient(ellipse, rgba(20,255,236,0.2) 0%, transparent 70%)", filter: "blur(8px)", transform: "translateX(-50%) translateY(10px) translateZ(-40px)" }} />
-      </motion.div>
-
-      {/* Name badge floating below photo */}
-      <motion.div
-        style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", padding: "10px 24px", borderRadius: 999, background: "rgba(5,10,14,0.9)", border: "1px solid rgba(20,255,236,0.3)", backdropFilter: "blur(10px)", whiteSpace: "nowrap", zIndex: 10 }}
-        animate={{ y: [0, -5, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <span style={{ background: "linear-gradient(135deg,#14ffec,#7b2fff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontSize: 13, fontWeight: 700, fontFamily: "'Space Grotesk', sans-serif" }}>
-          {personalInfo.name}
-        </span>
-        <span style={{ color: "#5a8080", fontSize: 11, marginLeft: 8 }}>· {personalInfo.title}</span>
+        <div
+          style={{ position: "absolute", left: "50%", width: 240, height: 24, background: "radial-gradient(ellipse, rgba(13,115,119,0.25) 0%, transparent 70%)", filter: "blur(8px)", transform: "translateX(-50%) translateY(16px) translateZ(-40px)", top: "100%" }}
+        />
       </motion.div>
 
       {/* Orbiting particle teal */}
-      <motion.div style={{ position: "absolute", width: 360, height: 400 }} animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}>
+      <motion.div style={{ position: "absolute", width: 380, height: 380 }} animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}>
         <div style={{ position: "absolute", width: 6, height: 6, borderRadius: "50%", background: "#14ffec", top: "2%", left: "50%", boxShadow: "0 0 8px #14ffec" }} />
       </motion.div>
 
       {/* Orbiting particle violet */}
-      <motion.div style={{ position: "absolute", width: 340, height: 380 }} animate={{ rotate: -360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}>
-        <div style={{ position: "absolute", width: 4, height: 4, borderRadius: "50%", background: "#7b2fff", bottom: "5%", right: "5%", boxShadow: "0 0 6px #7b2fff" }} />
+      <motion.div style={{ position: "absolute", width: 340, height: 340 }} animate={{ rotate: -360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}>
+        <div style={{ position: "absolute", width: 4, height: 4, borderRadius: "50%", background: "#7b2fff", bottom: "5%", right: "8%", boxShadow: "0 0 6px #7b2fff" }} />
       </motion.div>
 
       {/* Orbiting particle pink */}
-      <motion.div style={{ position: "absolute", width: 350, height: 390 }} animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear", delay: 5 }}>
-        <div style={{ position: "absolute", width: 3, height: 3, borderRadius: "50%", background: "#ff6eab", top: "15%", right: "2%", boxShadow: "0 0 5px #ff6eab" }} />
+      <motion.div style={{ position: "absolute", width: 360, height: 360 }} animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear", delay: 5 }}>
+        <div style={{ position: "absolute", width: 3, height: 3, borderRadius: "50%", background: "#ff6eab", top: "15%", right: "3%", boxShadow: "0 0 5px #ff6eab" }} />
       </motion.div>
 
       {/* Infinity symbol */}
       <motion.div
-        style={{ position: "absolute", fontSize: 26, color: "#14ffec", opacity: 0.2, bottom: "12%", right: "4%", userSelect: "none" }}
-        animate={{ opacity: [0.12, 0.28, 0.12], scale: [1, 1.1, 1] }}
+        style={{ position: "absolute", fontSize: 28, color: "#14ffec", opacity: 0.25, bottom: "8%", right: "6%", userSelect: "none" }}
+        animate={{ opacity: [0.15, 0.35, 0.15], scale: [1, 1.08, 1] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       >
         ∞
@@ -165,8 +170,8 @@ function Photo3D() {
 function Hero() {
   const { ref: bgRef } = useParallax({ speed: -10 });
 
-  const scrollToAbout = () => { document.querySelector("#about")?.scrollIntoView({ behavior: "smooth" }); };
-  const scrollToProjects = () => { document.querySelector("#projects")?.scrollIntoView({ behavior: "smooth" }); };
+  const scrollToAbout   = () => document.querySelector("#about")?.scrollIntoView({ behavior: "smooth" });
+  const scrollToProjects = () => document.querySelector("#projects")?.scrollIntoView({ behavior: "smooth" });
 
   const containerVariants = {
     hidden: {},
@@ -186,8 +191,8 @@ function Hero() {
         <motion.div style={{ position: "absolute", width: 500, height: 400, top: "-10%", left: "-10%", background: "radial-gradient(ellipse, rgba(13,115,119,0.18) 0%, transparent 70%)", filter: "blur(40px)" }} animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} />
         <motion.div style={{ position: "absolute", width: 400, height: 350, bottom: "0%", right: "5%", background: "radial-gradient(ellipse, rgba(123,47,255,0.15) 0%, transparent 70%)", filter: "blur(40px)" }} animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.9, 0.5] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }} />
         <motion.div style={{ position: "absolute", width: 300, height: 280, bottom: "20%", left: "5%", background: "radial-gradient(ellipse, rgba(255,110,171,0.10) 0%, transparent 70%)", filter: "blur(35px)" }} animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.8, 0.4] }} transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 6 }} />
-        {[[8,8],[60,45],[130,20],[220,60],[330,15],[450,40],[580,25],[640,70],[30,140],[100,200],[180,160],[280,210],[400,170],[520,190],[620,140],[50,310],[160,380],[270,340],[380,420],[490,370],[600,400],[660,280],[20,470],[110,500],[230,460],[350,490],[470,510],[560,470],[630,500]].map(([x, y], i) => (
-          <motion.div key={i} style={{ position: "absolute", left: x, top: y, width: i % 5 === 0 ? 2 : 1.2, height: i % 5 === 0 ? 2 : 1.2, borderRadius: "50%", background: "#fff" }} animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2 + (i % 4), repeat: Infinity, delay: i * 0.15, ease: "easeInOut" }} />
+        {[[8,8],[60,45],[130,20],[220,60],[330,15],[450,40],[580,25],[640,70],[30,140],[100,200],[180,160],[280,210],[400,170],[520,190],[620,140],[50,310],[160,380],[270,340],[380,420],[490,370],[600,400],[660,280],[20,470],[110,500],[230,460],[350,490],[470,510],[560,470],[630,500]].map(([x,y],i) => (
+          <motion.div key={i} style={{ position: "absolute", left: x, top: y, width: i%5===0?2:1.2, height: i%5===0?2:1.2, borderRadius: "50%", background: "#fff" }} animate={{ opacity: [0.3,1,0.3] }} transition={{ duration: 2+(i%4), repeat: Infinity, delay: i*0.15, ease: "easeInOut" }} />
         ))}
       </div>
 
@@ -201,7 +206,7 @@ function Hero() {
         <motion.div className="flex flex-col items-start max-w-xl" variants={containerVariants} initial="hidden" animate="visible">
           <motion.div variants={itemVariants} className="mb-6">
             <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 999, background: "rgba(13,115,119,0.15)", border: "1px solid rgba(20,255,236,0.3)", color: "#14ffec", fontSize: 13, fontWeight: 500 }}>
-              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#14ffec", display: "inline-block", animation: "pulse 2s infinite" }} />
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#14ffec", display: "inline-block" }} className="animate-pulse" />
               Available for opportunities
             </span>
           </motion.div>
@@ -222,7 +227,7 @@ function Hero() {
           </motion.p>
 
           <motion.div variants={itemVariants} style={{ display: "flex", flexWrap: "wrap", gap: 14, marginBottom: 36 }}>
-            <motion.button onClick={scrollToProjects} style={{ padding: "12px 28px", borderRadius: 999, background: "linear-gradient(135deg,#0d7377,#7b2fff)", color: "#fff", fontWeight: 600, fontSize: 14, border: "none", cursor: "pointer", boxShadow: "0 0 25px rgba(20,255,236,0.2)", fontFamily: "inherit" }} whileHover={{ scale: 1.06, boxShadow: "0 0 40px rgba(20,255,236,0.35)" }} whileTap={{ scale: 0.95 }}>
+            <motion.button onClick={scrollToProjects} style={{ padding: "12px 28px", borderRadius: 999, background: "linear-gradient(135deg,#0d7377,#7b2fff)", color: "#fff", fontWeight: 600, fontSize: 14, border: "none", cursor: "pointer", boxShadow: "0 0 25px rgba(20,255,236,0.2)", fontFamily: "inherit" }} whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.95 }}>
               View My Work
             </motion.button>
             <motion.a href={"mailto:" + personalInfo.email} style={{ padding: "12px 28px", borderRadius: 999, border: "1px solid rgba(20,255,236,0.35)", color: "#14ffec", fontSize: 14, fontWeight: 500, textDecoration: "none" }} whileHover={{ scale: 1.06, backgroundColor: "rgba(20,255,236,0.08)" }} whileTap={{ scale: 0.95 }}>
@@ -232,9 +237,9 @@ function Hero() {
 
           <motion.div variants={itemVariants} style={{ display: "flex", gap: 14 }}>
             {[
-              { icon: <GithubIcon />, href: personalInfo.github, label: "GitHub" },
-              { icon: <LinkedinIcon />, href: personalInfo.linkedin, label: "LinkedIn" },
-              { icon: <MailIcon />, href: "mailto:" + personalInfo.email, label: "Email" },
+              { icon: <GithubIcon />,   href: personalInfo.github,              label: "GitHub"   },
+              { icon: <LinkedinIcon />, href: personalInfo.linkedin,            label: "LinkedIn" },
+              { icon: <MailIcon />,     href: "mailto:" + personalInfo.email,   label: "Email"    },
             ].map((s) => (
               <motion.a key={s.label} href={s.href} target={s.label !== "Email" ? "_blank" : undefined} rel="noopener noreferrer" aria-label={s.label}
                 style={{ width: 42, height: 42, display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", border: "1px solid rgba(20,255,236,0.2)", color: "#5a9090", textDecoration: "none" }}
@@ -246,12 +251,15 @@ function Hero() {
           </motion.div>
         </motion.div>
 
-
+        {/* Right: 3D Moon */}
+        <motion.div initial={{ opacity: 0, scale: 0.8, x: 60 }} animate={{ opacity: 1, scale: 1, x: 0 }} transition={{ duration: 1, delay: 0.4, ease: "easeOut" }} className="flex items-center justify-center shrink-0">
+          <Moon3D />
+        </motion.div>
       </div>
 
       {/* Scroll indicator */}
       <motion.button onClick={scrollToAbout} style={{ position: "absolute", bottom: 32, left: "50%", transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", color: "#3a7070" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.8 }} whileHover={{ color: "#14ffec" }}>
-        <span style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontFamily: "sans-serif" }}>Scroll</span>
+        <span style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase" }}>Scroll</span>
         <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
           <ArrowDownIcon />
         </motion.div>

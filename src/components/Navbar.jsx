@@ -41,9 +41,10 @@ function Navbar() {
   }, []);
 
   const handleNavClick = (href) => {
-    setIsOpen(false);
+    // Scroll first, then close menu — prevents menu closing before scroll fires
     const el = document.querySelector(href);
     if (el) el.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => setIsOpen(false), 100);
   };
 
   return (
